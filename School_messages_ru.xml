@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<krpano>
+
+<!-- ************************ -->
+<!--         Messages         -->
+<!-- ************************ -->
+
+  <data name="ru_project_title"><![CDATA[New Project]]></data>
+
+
+  <data name="ru_panogroup48_title"><![CDATA[Group 1]]></data>
+
+  <data name="ru_pano41_title"><![CDATA[главный вход]]></data>
+  <data name="ru_spotpolygon95_tooltip"><![CDATA[центральный зал]]></data>
+  <data name="ru_pano47_title"><![CDATA[центральный зал]]></data>
+  <data name="ru_spotpolygon96_tooltip"><![CDATA[главный вход]]></data>
+  <data name="ru_spotpolygon143_tooltip"><![CDATA[разветвлённый зал]]></data>
+  <data name="ru_pano45_title"><![CDATA[разветвлённый зал]]></data>
+  <data name="ru_spotpolygon187_tooltip"><![CDATA[коридор налево]]></data>
+  <data name="ru_spotpolygon229_tooltip"><![CDATA[коридор направо]]></data>
+  <data name="ru_spotpolygon271_tooltip"><![CDATA[стэнд]]></data>
+  <data name="ru_spotpolygon313_tooltip"><![CDATA[центральный зал]]></data>
+  <data name="ru_pano46_title"><![CDATA[стэнд]]></data>
+  <data name="ru_spotpolygon314_tooltip"><![CDATA[разветвлённый зал]]></data>
+  <data name="ru_pano42_title"><![CDATA[коридор налево]]></data>
+  <data name="ru_spotpolygon357_tooltip"><![CDATA[разветвлённый зал]]></data>
+  <data name="ru_spotpolygon395_tooltip"><![CDATA[1 часть левой стороны]]></data>
+  <data name="ru_pano37_title"><![CDATA[1 часть левой стороны]]></data>
+  <data name="ru_spotpolygon433_tooltip"><![CDATA[коридор налево]]></data>
+  <data name="ru_spotpolygon469_tooltip"><![CDATA[2 часть левой стороны]]></data>
+  <data name="ru_pano38_title"><![CDATA[2 часть левой стороны]]></data>
+  <data name="ru_spotpolygon505_tooltip"><![CDATA[1 часть левой стороны]]></data>
+  <data name="ru_spotpolygon539_tooltip"><![CDATA[вход с левого корпуса]]></data>
+  <data name="ru_pano39_title"><![CDATA[вход с левого корпуса]]></data>
+  <data name="ru_spotpolygon573_tooltip"><![CDATA[2 часть левой стороны]]></data>
+  <data name="ru_pano43_title"><![CDATA[коридор направо]]></data>
+  <data name="ru_spotpolygon605_tooltip"><![CDATA[разветвлённый зал]]></data>
+  <data name="ru_spotpolygon635_tooltip"><![CDATA[правая сторона]]></data>
+  <data name="ru_pano44_title"><![CDATA[правая сторона]]></data>
+  <data name="ru_spotpolygon665_tooltip"><![CDATA[коридор направо]]></data>
+  <data name="ru_spotpolygon693_tooltip"><![CDATA[вход с правого корпуса]]></data>
+  <data name="ru_pano40_title"><![CDATA[вход с правого корпуса]]></data>
+  <data name="ru_spotpolygon721_tooltip"><![CDATA[правая сторона]]></data>
+  <data name="ru_spotpolygon722_tooltip"><![CDATA[правая сторона]]></data>
+
+
+
+
+
+	<data name="ru_panogroup48_floor_title"><![CDATA[Group 1]]></data>
+	<data name="ru_spotmap72_tooltip"><![CDATA[главный вход]]></data>
+	<data name="ru_spotmap73_tooltip"><![CDATA[центральный зал]]></data>
+	<data name="ru_spotmap74_tooltip"><![CDATA[разветвлённый зал]]></data>
+	<data name="ru_spotmap75_tooltip"><![CDATA[стэнд]]></data>
+	<data name="ru_spotmap76_tooltip"><![CDATA[коридор налево]]></data>
+	<data name="ru_spotmap77_tooltip"><![CDATA[коридор направо]]></data>
+	<data name="ru_spotmap78_tooltip"><![CDATA[правая сторона]]></data>
+	<data name="ru_spotmap79_tooltip"><![CDATA[вход с правого корпуса]]></data>
+	<data name="ru_spotmap80_tooltip"><![CDATA[1 часть левой стороны]]></data>
+	<data name="ru_spotmap81_tooltip"><![CDATA[2 часть левой стороны]]></data>
+	<data name="ru_spotmap82_tooltip"><![CDATA[вход с левого корпуса]]></data>
+
+  <data name="ru_contextmenuopenFsLabel"><![CDATA[Enter Fullscreen]]></data>
+  <data name="ru_contextmenucloseFsLabel"><![CDATA[Exit Fullscreen]]></data>
+  <data name="ru_contextmenunormallabel"><![CDATA[Normal View]]></data>
+  <data name="ru_contextmenuarchitecturallabel"><![CDATA[Architectural View]]></data>
+  <data name="ru_contextmenulittleplanetlabel"><![CDATA[Little Planet View]]></data>
+
+
+  <data name="ru_vr_setup_hmd0"><![CDATA[SELECT YOUR HMD]]></data>
+  <data name="ru_vr_setup_advanced"><![CDATA[ADVANCED SETTINGS]]></data>
+  <data name="ru_vr_setup_title"><![CDATA[WEB VR SETTINGS]]></data>
+  <data name="ru_vr_setup_dvn1"><![CDATA[Device:]]></data>
+  <data name="ru_vr_setup_siz1"><![CDATA[Screen size:]]></data>
+  <data name="ru_vr_setup_ipd1"><![CDATA[IPD:]]></data>
+  <data name="ru_vr_setup_hmd1"><![CDATA[HMD:]]></data>
+  <data name="ru_vr_setup_hmd3"><![CDATA[Customize]]></data>
+  <data name="ru_vr_setup_cal"><![CDATA[Calibrate gyroscope]]></data>
+  <data name="ru_vr_setup_sav"><![CDATA[SAVE]]></data>
+  <data name="ru_vr_setup_rst"><![CDATA[RESET]]></data>
+  <data name="ru_vr_setup_simple"><![CDATA[SIMPLE]]></data>
+  <data name="ru_vr_setup_cls"><![CDATA[CLOSE]]></data>
+  <data name="ru_vr_setup_m31"><![CDATA[HMD SETTINGS]]></data>
+  <data name="ru_vr_setup_fov1"><![CDATA[FOV:]]></data>
+  <data name="ru_vr_setup_dst1"><![CDATA[Distortion:]]></data>
+  <data name="ru_vr_setup_d2tx"><![CDATA[Distortion 2:]]></data>
+  <data name="ru_vr_setup_vig1"><![CDATA[Vignette:]]></data>
+  <data name="ru_vr_setup_cac1"><![CDATA[Chromatic aberration:]]></data>
+  <data name="ru_vr_setup_olp1"><![CDATA[Overlap:]]></data>
+  <data name="ru_vr_setup_m35"><![CDATA[RETURN]]></data>
+  <data name="ru_vr_setup_cb1"><![CDATA[GYROSCOPE]]></data>
+  <data name="ru_vr_setup_cb2"><![CDATA[Place the device on a flat and[br]stable surface and tab CALIBRATE[br]to correct a gyroscope drifting.]]></data>
+  <data name="ru_vr_setup_cb3"><![CDATA[CALIBRATE]]></data>
+  <data name="ru_vr_setup_cb4"><![CDATA[RESET]]></data>
+  <data name="ru_vr_setup_cb5"><![CDATA[RETURN]]></data>
+  <data name="ru_vr_setup_cb6"><![CDATA[Calibrating...]]></data>
+  <data name="ru_vr_setup_cb7"><![CDATA[Successful calibration]]></data>
+  <data name="ru_vr_setup_cb8"><![CDATA[Calibration failed]]></data>
+  <data name="ru_vr_setup_unavailable"><![CDATA[VR mode[br]is unavailable on your device]]></data>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</krpano>

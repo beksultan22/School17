@@ -1,0 +1,1288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<krpano version="1.19-pr16">
+
+  <!-- unsupported kind of display : PointMap -->
+
+
+  
+  <!-- Spot Style - Default Polygon Spot Style -->
+  <style name="PolygonDefaultPolygonSpotStyle"
+           visible="false"
+           bordercolor="0xffffff"
+           fillcolor="0xffffff"
+           borderwidth="0"
+           borderalpha="1"
+           fillalpha="0.40000000000000002"
+           capture="false"
+           onhover="onhoverPolygonDefaultPolygonSpotStyle"
+           onover="onoverPolygonDefaultPolygonSpotStyle"
+           onout="onoutPolygonDefaultPolygonSpotStyle"
+           />
+  <action name="onhoverPolygonDefaultPolygonSpotStyle">
+    showTooltip('hotspot');
+  </action>
+
+  <action name="onoverPolygonDefaultPolygonSpotStyle">
+    set(borderwidth, 0);
+  </action>
+
+  <action name="onoutPolygonDefaultPolygonSpotStyle">
+
+    set(borderwidth, 0);
+    hideTooltip();
+  </action>
+
+
+
+<!-- ********** -->
+<!-- Double Click -->
+<!-- id : doubleclick -->
+<!-- ********** -->
+  <events name="doubleclick_events" keep="true" ondoubleclick="doubleclick_ondoubleclick"/>
+  <action name="doubleclick_ondoubleclick">switchFullscreen();
+
+
+  </action>
+<!-- ********** -->
+<!-- Context menu -->
+<!-- id : contextmenu -->
+<!-- ********** -->
+  <contextmenu fullscreen="false" versioninfo="false" touch="true">
+    <item name="normal"        onclick="setViewNormal();
+" separator="true"/>
+    <item name="architectural" onclick="setViewArchitectural();
+"/>
+    <item name="littleplanet"  onclick="setViewLittlePlanet();
+"/>
+    <item name="fullscreenentry" onclick="enterFullscreen();
+" separator="true"/>
+  </contextmenu>
+
+  <events name="contextmenuevents" keep="true" 
+    onenterfullscreen="updateContextMenu" onexitfullscreen="updateContextMenu" 
+    onxmlcomplete="updateContextMenu" 
+    changetourlanguage="updateContextMenu" 
+    />
+  <events name="contextmenuvrevents" keep="true" 
+    onvravailable="updateContextMenu();" onvrunavailable="updateContextMenu();"
+    devices="html5"
+    />
+  <action name="updateContextMenu">
+    getmessage(contextmenu.item[normal].caption, contextmenunormallabel);
+    getmessage(contextmenu.item[architectural].caption, contextmenuarchitecturallabel);
+    set(sceneisfull360, false);
+    if(scene[get(xml.scene)].full360,
+      sub(viewhfov, panoview.hmax, panoview.hmin);
+      if (viewhfov == 360,
+        sub(viewvfov, panoview.vmax, panoview.vmin);
+        if (viewvfov == 180,
+          set(sceneisfull360, true);
+        );
+      );
+    );
+    if (sceneisfull360 AND (device.webgl OR device.flash),
+      set(contextmenu.item[littleplanet].visible, true);
+      getmessage(contextmenu.item[littleplanet].caption, contextmenulittleplanetlabel);
+    ,
+      set(contextmenu.item[littleplanet].visible, false);
+    );
+    if (device.fullscreensupport,
+      if(tour_fullscreen,
+        getmessage(contextmenu.item[fullscreenentry].caption, contextmenucloseFsLabel);
+        set(contextmenu.item[fullscreenentry].onclick, exitFullscreen();
+);
+       ,
+        getmessage(contextmenu.item[fullscreenentry].caption, contextmenuopenFsLabel);
+        set(contextmenu.item[fullscreenentry].onclick, enterFullscreen();
+);
+      );
+     ,
+      set(contextmenu.item[fullscreenentry].visible, false);
+    );
+  </action>
+
+<!-- ********* -->
+<!-- Gyroscope -->
+<!-- ********* -->
+
+
+<plugin name="gyroscope"
+        url="%FIRSTXML%/graphics/gyro2.js"
+        keep="true"
+        devices="no-desktop.and.html5"
+
+        onunavailable="checkGyroUnavailable();"
+        sensor_mode="1"
+        friction="auto"
+        autocalibration="true"
+        touch_mode="full"
+        onavailable="delayedcall(1, checkGyroAvailability(););"
+        enabled="false"
+        activated="false"
+        />
+
+<events name="gyroscopeEvents" onnewpano="planarGyroscopeTest();" keep="true" />
+
+<action name="planarGyroscopeTest">
+  if(plugin[gyroscope],
+    if(scene[get(xml.scene)].full360,
+      set(sceneisfull360, false);
+      sub(viewhfov, panoview.hmax, panoview.hmin);
+      if (viewhfov == 360,
+        sub(viewvfov, panoview.vmax, panoview.vmin);
+        if (viewvfov == 180,
+          set(sceneisfull360, true);
+        );
+      );
+      if (sceneisfull360,
+        set(plugin[gyroscope].camroll, true);
+      ,
+        set(plugin[gyroscope].camroll, false);
+      );
+    ,
+      set(plugin[gyroscope].camroll, false);
+    );
+  );
+</action>
+
+<action name="changeGyroscopeState">
+  if(plugin[gyroscope],
+    if (plugin[gyroscope].isavailable,
+      if(%1,
+        set(plugin[gyroscope].activated,true);
+      ,
+        set(plugin[gyroscope].activated,false);
+      );
+      if (%1 != plugin[gyroscope].enabled,
+        if(plugin[gyroscope].activated,
+          switch(plugin[gyroscope].enabled);
+        ,
+          set(plugin[gyroscope].enabled, false);
+        );
+        if (plugin[gyroscope].enabled, events.dispatch(ongyroscopeon);, events.dispatch(ongyroscopeoff););
+      );
+    );
+  );
+</action>
+
+<action name="checkGyroAvailability">
+  if(plugin[gyroscope],
+    if (plugin[gyroscope].isavailable,
+      
+      set(sceneisfull360, false);
+      if (scene[get(xml.scene)].full360,
+        sub(viewhfov, panoview.hmax, panoview.hmin);
+        if (viewhfov == 360,
+          sub(viewvfov, panoview.vmax, panoview.vmin);
+          if (viewvfov == 180,
+            set(sceneisfull360, true);
+          );
+        );
+      );
+      set(delaythegyrocheck, false);
+      if (sceneisfull360 AND tour_firstlittleplanet, set(delaythegyrocheck, true));
+
+      ifnot(delaythegyrocheck,
+        switch(plugin[gyroscope].enabled);
+        set(plugin[gyroscope].activated,true);
+        set(tour_gyroscopedevices, true);
+        events.dispatch(ongyroscopeavailable);
+      ,
+        delayedcall(1, checkGyroAvailability(););
+      );
+    ,
+      set(tour_gyroscopedevices, false);
+    );
+    if (plugin[gyroscope].enabled, events.dispatch(ongyroscopeon);, events.dispatch(ongyroscopeoff););
+  ,
+    checkGyroUnavailable();
+  );
+</action>
+
+<action name="checkGyroUnavailable">
+  set(plugin[gyroscope].activated, false);
+  set(plugin[gyroscope].enabled, false);
+  set(tour_gyroscopedevices, false);
+  events.dispatch(ongyroscopeunavailable);
+</action>
+
+<!-- ********** -->
+<!-- Panorama Combobox -->
+<!-- id : panoramacombobox -->
+<!-- ********** -->
+
+  <!-- path to the scrollarea plugin -->
+  <panoramacombobox_kr_scrollareaplugin
+    url.html5="%FIRSTXML%/graphics/scrollarea.js"
+    url.flash="%FIRSTXML%/graphics/scrollarea.swf"
+    />
+
+  <!-- core internal layer styles -->
+  <style name="panoramacombobox_kr_container_style" type="container" maskchildren="true" bgcapture="true" visible="false" onclick="panoramacombobox_kr_onclick_event();" mergedalpha="false" alpha="1.0" />
+  <style name="panoramacombobox_kr_marker_style" type="text" align="righttop" edge="center" html="▼" havemarkersize="false" onautosized="set(havemarkersize,true);" mergedalpha="false" alpha="1.0" />
+  <style name="panoramacombobox_kr_item_style"  type="text" wordwrap="false" vcenter="true" align="lefttop" onover="if(!combbox_item_pressed,onoveritem());asyncloop(hovering,,if(!combbox_item_pressed,onoutitem()));" ondown="onoveritem(); set(combbox_item_pressed,true);" onup="onoutitem(); set(combbox_item_pressed,false);" onoveritem="set(bg,true);" onoutitem="set(bg,false);" mergedalpha="false" alpha="1.0" />
+
+
+
+  <panoramacombobox_kr_design name="default" margin="2" open_close_speed="0.25">
+    <!-- default design - white box with black text and blue selection -->
+    <style name="panoramacombobox_kr_container_style" bgalpha="1.0" bgcolor="0xFFFFFF" bgborder="1 0xFFFFFF 0.5" bgroundedge="1" bgshadow="0 1 3 0x000000 1.0" />
+    <style name="panoramacombobox_kr_marker_style" css="color:#FFFFFF;" bg="false" txtshadow="0 0 2 0x000000 1" />
+    <style name="panoramacombobox_kr_group_style" css="color:#222222;font-weight:bold;" padding="4" bg="false" bgcolor="0xC7E4FC" bgalpha="1.0" bgroundedge="1" txtshadow="0 0 1 0xFFFFFF 1.0" />
+    <style name="panoramacombobox_kr_item_style" css="color:#222222;" padding="4" bg="false" bgcolor="0xC7E4FC" bgalpha="1.0" bgroundedge="1" txtshadow="0 0 1 0xFFFFFF 1.0" />
+  </panoramacombobox_kr_design>
+
+
+
+
+  <!-- internal events -->
+  <events name="panoramacombobox_kr_xml_plugin_events" keep="true"
+    onxmlcomplete="panoramacombobox_kr_parse_xml_elements();"
+    onresize="panoramacombobox_kr_closelist();"
+    />
+
+  <!-- krpano version check -->
+  <action name="panoramacombobox_kr_versioncheck" autorun="preinit">
+    if(build LT '2017-09-13',
+      error('combobox.xml - too old krpano version!');
+      set(events[panoramacombobox_kr_xml_plugin_events].name, null);
+      set(action[panoramacombobox_kr_addComboboxLayer].content, '');
+      set(action[panoramacombobox_kr_removeComboboxLayer].content, '');
+    );
+  </action>
+
+  <action name="panoramacombobox_kr_parse_xml_elements" scope="local">
+        copy(cb, combobox["panoramacombobox"]);
+        if(cb AND cb.name AND cb.parsed != true,
+          set(cb.parsed, true);
+          panoramacombobox_kr_addComboboxLayer(get(cb.name), get(cb.design));
+          copy(ly, layer[get(cb.name)]);
+          copyattributes(get(ly), get(cb));
+          set(ly.keep, true);
+          def(item_cnt, integer, get(cb.item.count));
+          if(item_cnt GT 0,
+            def(item_i, integer, 0);
+            loop(item_i LT  item_cnt,
+              panoramacombobox_kr_additem(get(ly.name), get(cb.item[get(item_i)].name), get(cb.item[get(item_i)].caption), get(cb.item[get(item_i)].onclick));
+              inc(item_i);
+            );
+          );
+        );
+  </action>
+
+  <!-- dynamically add a combobox layer -->
+  <action name="panoramacombobox_kr_addComboboxLayer" scope="local" args="cbname, design">
+    <!-- create the layer -->
+    addlayer(get(cbname));
+    copy(cb, layer[get(cbname)]);
+    set(cb.keep, true);
+
+    <!-- copy the design settings (or set defaults) -->
+    if(!panoramacombobox_kr_design[get(design)].name, set(design,'default'));
+    copy(cb.cbdesign, panoramacombobox_kr_design[get(design)]);
+    calc(cb.margin, cb.cbdesign.margin !== null ? cb.cbdesign.margin : 2);
+    calc(cb.open_close_speed, cb.cbdesign.open_close_speed !== null ? cb.cbdesign.open_close_speed : 0.25);
+    <!-- load the styles and copy the design style settings -->
+    cb.loadstyle(panoramacombobox_kr_container_style);
+    copyattributes(get(cb), get(cb.cbdesign.style[panoramacombobox_kr_container_style]));
+
+    <!-- add/build/map actions -->
+    calc(cb.addItem,          'panoramacombobox_kr_additem(' + cbname + ', null, "%%1", "%%2");');
+    calc(cb.addNamedItem,     'panoramacombobox_kr_additem(' + cbname + ', "%%1", "%%2", "%%3");');
+    calc(cb.addIdItem,        'panoramacombobox_kr_additem(' + cbname + ', "%%1", "%%2", "%%3");');
+    calc(cb.selectItem,       'panoramacombobox_kr_finditem(' + cbname + ', "%%1", __cb_fi); if(__cb_fi GE 0, panoramacombobox_kr_selectitem(' + cbname + ', get(__cb_fi))); delete(__cb_fi);');
+    calc(cb.selectItemByName, 'panoramacombobox_kr_selectitem(' + cbname + ', "%%1");');
+    calc(cb.selectIdItem,     'panoramacombobox_kr_selectitem(' + cbname + ', "%%1");');
+    calc(cb.removeAll,        'panoramacombobox_kr_removeitems(' + cbname + ');');
+    calc(cb.openList,         'panoramacombobox_kr_openlist(' + cbname + ');');
+    calc(cb.closeList,        'panoramacombobox_kr_closelist(' + cbname + ');');
+
+    <!-- create sub-layers -->
+    def(saname, string, 'panoramacombobox_kr_%1_scrollarea');
+    addlayer(get(saname));
+    copy(sa, layer[get(saname)]);
+    copy(sa.parent, cbname);
+    copy(sa.url, panoramacombobox_kr_scrollareaplugin.url);
+    copy(sa.keep, true);
+    copy(sa.align, lefttop);
+    set(sa.direction, v);
+    set(sa.enabled, false);
+    set(sa.width, 100%);
+    set(sa.height, 100%);
+    copy(cb.scrollarea, sa);
+
+    def(mkname, string, 'panoramacombobox_kr_%1_marker');
+    addlayer(get(mkname));
+    copy(mk, layer[get(mkname)]);
+    copy(mk.parent, saname);
+    copy(mk.keep, true);
+    mk.loadstyle(panoramacombobox_kr_marker_style);
+    copyattributes(get(mk), get(cb.cbdesign.style[panoramacombobox_kr_marker_style]));
+    copy(cb.marker, mk);
+
+    <!-- item data array -->
+    cb.createarray('item');
+
+    <!-- item autosizing information -->
+    set(cb.autosize_i, 0);
+    set(cb.autosize_cnt, 0);
+    set(cb.autosize_max_w, 0);
+    set(cb.autosize_max_h, 0);
+
+    set(cb.lastselecteditemindex, 0);
+    set(cb.selecteditemindex, 0);
+  </action>
+
+
+  <!-- dynamically remove a combobox element -->
+  <action name="panoramacombobox_kr_removeComboboxLayer" scope="local" args="cbname">
+    if(layer[get(cbname)],
+      copy(cb, layer[get(cbname)]);
+      if(cb === global.openedcombobox, delete(global.openedcombobox));
+      if(cb,
+        removelayer(get(cbname), true);
+      );
+    );
+  </action>
+
+
+  <!-- default onclick event for combobox elements: open the list -->
+  <action name="panoramacombobox_kr_onclick_event">
+    panoramacombobox_kr_openlist(get(name));
+  </action>
+
+
+  <!-- dynamically add items -->
+  <action name="panoramacombobox_kr_additem" scope="local" args="cbname, itemname, itemcaption, itemonclick">
+    copy(cb, layer[get(cbname)]);
+
+    <!-- when no item name is set, generate an automatic one -->
+    if(itemname === null, calc(itemname, 'autoname_' + cb.item.count); );
+
+    <!-- save the item caption and onclick event -->
+    copy(cb.item[get(itemname)].caption, itemcaption);
+    copy(cb.item[get(itemname)].onclick, itemonclick);
+
+    inc(cb.autosize_cnt);
+
+    <!-- create the item layer/textfield -->
+    calc(itemlayername, 'comboboxitem_' + cbname + '_' + itemname);
+    addlayer(get(itemlayername));
+    copy(li, layer[get(itemlayername)]);
+
+
+
+    li.loadstyle(panoramacombobox_kr_item_style);
+    indexoftxt(itemisagroup, get(itemname), "panogroup");
+    if (itemisagroup != -1,
+      copyattributes(get(li), get(cb.cbdesign.style[panoramacombobox_kr_group_style]));
+     ,
+    copyattributes(get(li), get(cb.cbdesign.style[panoramacombobox_kr_item_style]));
+    );
+
+
+
+
+    copy(li.parent, cb.scrollarea.name);
+    copy(li.keep, true);
+    copy(li.cblayername, cb.name);
+    copy(li.itemname, itemname);
+    copy(li.html, itemcaption);
+    set(li.onautosized, delayedcall(0,panoramacombobox_kr_item_autosize_update()) );
+    set(li.onclick, panoramacombobox_kr_item_onclick() );
+
+    copy(cb.item[get(itemname)].itemlayername, itemlayername);
+  </action>
+
+
+  <!-- onautosized callback from the item textfield -->
+  <action name="panoramacombobox_kr_item_autosize_update" scope="local">
+    copy(cb, layer[get(caller.cblayername)]);
+    inc(cb.autosize_i);
+    Math.max(cb.autosize_max_w, caller.width);
+    Math.max(cb.autosize_max_h, caller.height);
+    if(cb.autosize_i == cb.autosize_cnt, panoramacombobox_kr_align_items(get(cb.name)); );
+  </action>
+
+
+  <!-- align the image and set the combobox size -->
+  <action name="panoramacombobox_kr_align_items" scope="local" args="cbname">
+    copy(cb, layer[get(cbname)]);
+    if(cb.marker.havemarkersize == false OR cb.scrollarea.loaded == false,
+      <!-- wait until everything is ready -->
+      delayedcall(calc(cb.name + '_waitformarkersize'), 0.01, panoramacombobox_kr_align_items(get(cbname)) );
+      ,
+      <!-- set the item positions and the combobox size -->
+      if(global.openedcombobox === cb, panoramacombobox_kr_closelist() );
+      copy(sa, cb.scrollarea);
+      calc(itemwidth, cb.margin GT 0 ? -2 * cb.margin : '100%');
+      copy(mk_w, cb.marker.width);
+      copy(item_cnt, cb.autosize_cnt);
+
+      for(def(item_i, integer, 0), item_i LT item_cnt, inc(item_i),
+        copy(li, layer[get(cb.item[get(item_i)].itemlayername)]);
+        set(li.x, get(cb.margin));
+        copy(li.width, itemwidth);
+        copy(li.height, cb.autosize_max_h);
+        calc(li.y, cb.margin + item_i * (cb.autosize_max_h + cb.margin));
+      );
+
+      if(cb.width == null OR cb.width == cb.lastautosizedwidth,
+        <!-- no combobox width (or an autosized width) set - set the largest item width -->
+        calc(cb.width, cb.margin + cb.autosize_max_w + 2 + mk_w + cb.margin);
+        copy(cb.lastautosizedwidth, cb.width);
+      );
+
+      calc(cb.height, 2*cb.margin + cb.autosize_max_h);
+      calc(sa.height, cb.margin + item_cnt*(cb.margin+cb.autosize_max_h));
+      calc(sa.y, -(cb.selecteditemindex * (cb.autosize_max_h + cb.margin)));
+      calc(cb.marker.x, cb.margin + mk_w/2);
+      tween(layer[get(cb.name)].marker.y, calc(cb.margin + cb.selecteditemindex*(cb.autosize_max_h + cb.margin) + cb.autosize_max_h/2), 0.1);
+    );
+  </action>
+
+
+  <!-- default onclick event for items: select the current item, close the list and call the item onclick event -->
+  <action name="panoramacombobox_kr_item_onclick" scope="local">
+    copy(cb, layer[get(caller.cblayername)]);
+    copy(itemname, caller.itemname);
+    panoramacombobox_kr_selectitem(get(cb.name), get(itemname));
+
+    if(global.openedcombobox === cb, panoramacombobox_kr_closelist() );
+
+    if(cb.item[get(itemname)].onclick,
+      <!-- call the onclick event after the combobox has closed -->
+      delayedcall(get(cb.open_close_speed),
+        copy(cb.curitem, cb.item[get(itemname)]);
+        callwith(cb,
+          cb.item[get(itemname)].onclick();
+        );
+      );
+    );
+  </action>
+
+
+  <!-- select an item -->
+  <action name="panoramacombobox_kr_selectitem" scope="local" args="cbname, itemname">
+    if(global.combbox_item_pressed != true,
+      copy(cb, layer[get(cbname)]);
+      copy(cb.lastselecteditemindex, cb.selecteditemindex);
+      copy(cb.selecteditemindex, cb.item[get(itemname)].index);
+      <!-- call onchange event on selection change -->
+      if(cb.lastselecteditemindex != cb.selecteditemindex AND cb.onchange,
+        callwith(cb, onchange() );
+      );
+      if(global.openedcombobox === cb,
+        <!-- when opened, just close to the selected item -->
+        panoramacombobox_kr_closelist();
+        ,
+        if(layer[get(cbname)].scrollarea.loaded,
+          layer[get(cbname)].scrollarea.stopscrolling();
+          calc(offset, cb.selecteditemindex*(cb.autosize_max_h + cb.margin));
+          tween(layer[get(cbname)].marker.y, calc(cb.margin + offset + cb.autosize_max_h/2), 0);
+          tween(layer[get(cbname)].scrollarea.y, calc(-offset), 0, default, layer[get(cbname)].scrollarea.update(); );
+        );
+      );
+    );
+  </action>
+
+
+  <!-- find an item by its caption, the global variable defined in 'returnvariable' will contain the index  -->
+  <action name="panoramacombobox_kr_finditem" scope="local" args="cbname, itemcaption, returnvariable">
+    copy(cb, layer[get(cbname)]);
+    copy(item_cnt, cb.item.count);
+    set(calc('global.' + returnvariable), -1);
+    for(def(item_i, integer, 0), item_i LT  item_cnt, inc(item_i),
+      if(cb.item[get(item_i)].caption == itemcaption,
+        copy(calc('global.' + returnvariable), item_i);
+        copy(item_i, item_cnt);
+      );
+    );
+  </action>
+
+
+  <!-- remove all items (to be able to add new ones) -->
+  <action name="panoramacombobox_kr_removeitems" scope="local" args="cbname">
+    copy(cb, layer[get(cbname)]);
+    if(global.openedcombobox === cb, panoramacombobox_kr_closelist() );
+
+    <!-- remove all item layers -->
+    calc(item_i, cb.item.count - 1);
+    loop(item_i GE 0,
+      removelayer(get(cb.item[get(item_i)].itemlayername));
+      dec(item_i);
+    );
+
+    <!-- reset the item information -->
+    set(cb.item.count, 0);
+    set(cb.autosize_i,0);
+    set(cb.autosize_cnt, 0);
+    set(cb.autosize_max_w, 0);
+    set(cb.autosize_max_h, 0);
+    set(cb.selecteditemindex, 0);
+    set(cb.lastselecteditemindex, 0);
+    if(cb.width == cb.lastautosizedwidth, set(cb.width, null));
+  </action>
+
+
+  <!-- open the combobox list -->
+  <action name="panoramacombobox_kr_openlist" scope="local" args="cbname">
+    <!-- if another combobox is already open, close that one first -->
+    if(global.openedcombobox !== null, panoramacombobox_kr_closelist() );
+
+    copy(cb, layer[get(cbname)]);
+    copy(global.openedcombobox, cb);
+
+    <!-- find the available screen space above or below the combobox -->
+    calc(cbheight, 2*cb.margin + cb.autosize_max_h);
+    set(lx1, 0);
+    set(ly1, 0);
+    copy(lx2, cb.pixelwidth);
+    copy(ly2, cbheight);
+    layertoscreen(get(cbname), lx1,ly1, lx1,ly1);
+    layertoscreen(get(cbname), lx2,ly2, lx2,ly2);
+    calc(space_above, ly1 - area.pixely);
+    calc(space_below, area.pixelheight - (ly2 - area.pixely));
+
+    <!-- the required space for full opening: -->
+    calc(openheight, cb.margin + cb.autosize_cnt*(cb.margin+cb.autosize_max_h) );
+
+    <!-- vertical centered alignment? -->
+    calc(cb_edge, cb.edge ? cb.edge : cb.align);
+    calc(iscentered, cb_edge == 'left' OR cb_edge == 'center' OR cb_edge == 'right');
+    if(iscentered,
+      calc(openheight_max, space_above + space_below);
+      ,
+      Math.max(openheight_max, space_above, space_below);
+    );
+
+    <!-- limit the height to the available space (minus some margin) -->
+    Math.min(openheight, calc(openheight_max + cbheight - 20));
+
+    <!-- need vertical offset? (depending on the available space and the align/edge setting) -->
+    set(yoffset, null);
+    calc(top_overflow, -ly1 + area.pixely + openheight/2);
+    calc(bottom_overflow, ly2 - area.pixely + openheight/2 - area.pixelheight);
+    if(cb.parent,
+      <!-- no vertical offset inside other layers, do only a height clipping -->
+      Math.max(max_overflow, top_overflow, bottom_overflow, 0);
+      sub(openheight, max_overflow);
+      ,
+      if(iscentered,
+        if(openheight GE (area.pixelheight - 20),
+          set(yoffset,0);
+          ,
+          if(top_overflow GT 0, calc(yoffset, cb.y + top_overflow); );
+          if(bottom_overflow GT 0, calc(yoffset, cb.y - bottom_overflow); );
+        );
+      ,
+        indexoftxt(isbottomalign, get(cb_edge), 'bottom');
+        if(space_above GT space_below,
+          if(isbottomalign LT 0, calc(yoffset, cb.y - openheight + cbheight); );
+          ,
+          if(isbottomalign GE 0, calc(yoffset, cb.y - openheight + cbheight); );
+        );
+      );
+    );
+    if(yoffset != null,
+      copy(cb.ybackup, cb.y);
+      tween(layer[get(cbname)].y, calc(yoffset), get(cb.open_close_speed));
+    );
+
+    <!-- center the opened list at the selected item -->
+    calc(centeritem_y, -1 * (cb.margin + cb.selecteditemindex*(cb.margin+cb.autosize_max_h) + cb.autosize_max_h/2 - openheight/2));
+    clamp(centeritem_y, calc(openheight - cb.scrollarea.height), 0);
+
+    <!-- apply the changes now -->
+    tween(layer[get(cbname)].height, get(openheight), get(cb.open_close_speed));
+    tween(layer[get(cbname)].scrollarea.y, get(centeritem_y), get(cb.open_close_speed), default, layer[get(cbname)].scrollarea.update(); );
+
+    <!-- special html5/flash case:
+       rotating textfields (the marker symbol here) are not possible in
+       flash (a flashplayer limitation), so use a rotated symbol instead.
+    -->
+    if(device.html5,
+      tween(layer[get(cbname)].marker.rotate, 90, get(cb.open_close_speed));
+      ,
+      set(layer[get(cbname)].marker.html, '◀');
+    );
+
+    <!-- enable the scrollarea to allow the user to drag it -->
+    set(cb.scrollarea.enabled, true);
+
+    <!-- install a global onmousedown event to close the list when clicking at the pano -->
+    set(events[panoramacombobox_kr_xml_plugin_events].onmousedown, panoramacombobox_kr_closelist() );
+  </action>
+
+
+  <!-- close the current open list -->
+  <action name="panoramacombobox_kr_closelist" scope="local">
+    if(global.openedcombobox !== null,
+      copy(cb, global.openedcombobox);
+      delete(global.openedcombobox);
+
+      <!-- clear the global onmousedown event -->
+      set(events[panoramacombobox_kr_xml_plugin_events].onmousedown, null);
+
+      <!-- disable the dragging -->
+      set(cb.scrollarea.enabled, false);
+
+      <!-- closing animations -->
+      calc(offset, cb.selecteditemindex*(cb.autosize_max_h + cb.margin));
+      if(cb.ybackup !== null, tween(cb.y, get(cb.ybackup), get(cb.open_close_speed)));
+      layer[get(cb.name)].scrollarea.stopscrolling();
+      tween(layer[get(cb.name)].height, calc(2*cb.margin + cb.autosize_max_h), get(cb.open_close_speed));
+      tween(layer[get(cb.name)].scrollarea.y, calc(-offset), get(cb.open_close_speed), default, layer[get(cb.name)].scrollarea.update(); );
+      tween(layer[get(cb.name)].marker.y, calc(cb.margin + offset + cb.autosize_max_h/2), get(cb.open_close_speed));
+      <!-- special html5/flash case: rotate marker or change symbol -->
+      if(device.html5,
+        tween(layer[get(cb.name)].marker.rotate, 0, get(cb.open_close_speed));
+        ,
+        set(layer[get(cb.name)].marker.html, '▼');
+      );
+    );
+  </action>
+
+  <events name="panoramacomboboxStartTourEvents" onTourStart="set(layer[panoramacombobox].isStarted, true);if(layer[panoramacombobox].isLoaded,panoramacomboboxShow(););" keep="true" />
+
+
+  <combobox name="panoramacombobox"
+    design=""
+    keep="true"
+    visible="false"
+    zorder="4"
+    align="topleft"
+    x="5" y="10"
+    onloaded="panoramacomboboxLoaded();"
+    isStarted="false"
+    isLoaded="false"
+    />
+
+  <action name="panoramacomboboxLoaded">
+
+    layer[panoramacombobox].removeAll();
+
+
+    panoramacomboboxAddItem(panogroup48_title, panogroup48, pano41, false);
+    panoramacomboboxAddItem(pano41_title, pano41, pano41, true);
+    panoramacomboboxAddItem(pano47_title, pano47, pano47, true);
+    panoramacomboboxAddItem(pano45_title, pano45, pano45, true);
+    panoramacomboboxAddItem(pano46_title, pano46, pano46, true);
+    panoramacomboboxAddItem(pano42_title, pano42, pano42, true);
+    panoramacomboboxAddItem(pano37_title, pano37, pano37, true);
+    panoramacomboboxAddItem(pano38_title, pano38, pano38, true);
+    panoramacomboboxAddItem(pano39_title, pano39, pano39, true);
+    panoramacomboboxAddItem(pano43_title, pano43, pano43, true);
+    panoramacomboboxAddItem(pano44_title, pano44, pano44, true);
+    panoramacomboboxAddItem(pano40_title, pano40, pano40, true);
+    set(layer[panoramacombobox].isLoaded, true);
+
+    if(layer[panoramacombobox].isStarted,
+      panoramacomboboxShow();
+    );
+  </action>
+
+
+  <action name="panoramacomboboxAddItem">
+    getmessage(caption, %1);
+
+    indexoftxt(found, get(caption), '&amp;');
+    if(found GE 0,
+      subtxt(part1, get(caption), 0, get(found));
+      add(found, 1);
+      subtxt(part2, get(caption), get(found), get(caption.length));
+      txtadd(caption, get(part1), '&amp;', get(part2));
+    );
+    if(%4,
+      txtadd(title, "&#x00A0;&#x00A0;&#x00A0;", get(caption));
+    ,
+      set(title, get(caption));
+    );
+
+    layer[panoramacombobox].addNamedItem(%2, get(title), mainloadscene(%3));
+  </action>
+
+  <action name="panoramacomboboxUpdateLanguage">
+    layer[panoramacombobox].closeList();
+    layer[panoramacombobox].removeAll();
+
+    panoramacomboboxAddItem(panogroup48_title, panogroup48, pano41, false);
+    panoramacomboboxAddItem(pano41_title, pano41, pano41, true);
+    panoramacomboboxAddItem(pano47_title, pano47, pano47, true);
+    panoramacomboboxAddItem(pano45_title, pano45, pano45, true);
+    panoramacomboboxAddItem(pano46_title, pano46, pano46, true);
+    panoramacomboboxAddItem(pano42_title, pano42, pano42, true);
+    panoramacomboboxAddItem(pano37_title, pano37, pano37, true);
+    panoramacomboboxAddItem(pano38_title, pano38, pano38, true);
+    panoramacomboboxAddItem(pano39_title, pano39, pano39, true);
+    panoramacomboboxAddItem(pano43_title, pano43, pano43, true);
+    panoramacomboboxAddItem(pano44_title, pano44, pano44, true);
+    panoramacomboboxAddItem(pano40_title, pano40, pano40, true);
+
+    panoramacomboboxUpdateList();
+  </action>
+
+  <events name="panoramacomboboxEvents"
+    hidetourcontrols="panoramacomboboxHide();"
+    showtourcontrols="panoramacomboboxShow();"
+    onnewpano="panoramacomboboxOnPanorama();"
+    changetourlanguage="panoramacomboboxUpdateLanguage();"
+    keep="true"
+    />
+
+  <action name="panoramacomboboxHide">
+    set(layer[panoramacombobox].visible, false);
+  </action>
+
+  <action name="panoramacomboboxShow">
+  if(layer[panoramacombobox].isLoaded,
+    if (layer[panoramacombobox].item.count GT 0,
+      set(layer[panoramacombobox].visible, true);
+    ,
+      set(layer[panoramacombobox].visible, false);
+    );
+  ,
+    set(layer[panoramacombobox].visible, false);
+  );
+  </action>
+
+  <action name="panoramacomboboxOnPanorama">
+    if(layer[panoramacombobox].isLoaded,
+      panoramacomboboxUpdateList();
+    ,
+      delayedcall(0.2, panoramacomboboxOnPanorama);
+    );
+  </action>
+
+  <action name="panoramacomboboxUpdateList">
+    set(itemtoselect, get(scene[get(xml.scene)].name));
+    layer[panoramacombobox].selectItemByName(get(itemtoselect));
+  </action>
+
+  <action name="panoramacomboboxOpenComboboxList">
+    layer[panoramacombobox].openList();
+  </action>
+
+  <action name="panoramacomboboxCloseComboboxList">
+    layer[panoramacombobox].closeList();
+  </action>
+
+<!-- ********** -->
+<!-- Floor plan -->
+<!-- id : floorPlan -->
+<!-- ********** -->
+
+	<ptplugin name="floorPlan" engine="KolorFloorPlan">
+		<settings>
+			<option name="background_color" value="f2f2f2" type="string" />
+			<option name="background_lighter_color" value="ffffff" type="string" />
+			<option name="background_darker_color" value="cacaca" type="string" />
+			<option name="background_alpha" value="1" type="float" />
+			<option name="text_color" value="4dff40" type="string" />
+
+			<option name="resize" value="false" type="bool" />
+			<option name="fp_selector" value="one" type="string" />
+			<option name="fp_selector_label" value="floorPlanmenu_label" type="string" />
+			<option name="display_title" value="false" type="bool" />
+			<option name="title_font" value="Verdana" type="string" />
+			<option name="title_size" value="14" type="int" />
+			<option name="title_weight" value="normal" type="string" />
+			<option name="title_decoration" value="normal" type="string" />
+			<option name="title_color" value="000000" type="string" />
+			<option name="display_orientation" value="false" type="bool" />
+			<option name="display_radar" value="true" type="bool" />
+			<option name="radar_radius" value="50" type="int" />
+			<option name="radar_line_width" value="1" type="int" />
+			<option name="radar_line_color" value="001dff" type="string" />
+			<option name="radar_line_alpha" value="1" type="float" />
+			<option name="radar_fill_color" value="1100ff" type="string" />
+			<option name="radar_fill_alpha" value="0.59999999999999998" type="float" />
+			<option name="selected_effect" value="pulsate" type="string" />
+			<option name="close_on_click" value="false" type="bool" />
+			<option name="position" value="topright" type="string" />
+			<option name="zorder" value="5" type="int" />
+			<option name="use_i18n" value="true" type="bool" />
+		</settings>
+		
+		<floorplanItems selectedItem="" selectedSpot="" selectedSpotScene="" selectedSpotHeading="" selectedSpotFov="">
+			
+			
+							<floorplanItem 
+								name="fpitempanogroup48" 
+								width="569" 
+								height="1022" 
+								groupName="panogroup48" 
+								url="floorplan/plan_shkoly_panogroup48.jpg" 
+								title="panogroup48_floor_title"
+								heading="0">
+										<spot name="spotmap72" posX="0.0828220993" posY="0.461670011" heading="0" desc="spotmap72_tooltip" descType="tooltip" groupName="" isScene="true" planar="false" scene="pano41" jsClick="spotmap72ActionSpotFloorPlan">
+											<icon url="spots/pin_curved_2d_shadowed_user_defaultmap1.png" iconWidth="32" iconHeight="32" iconAnchor="center" />
+										</spot>
+										<spot name="spotmap73" posX="0.211656004" posY="0.470187008" heading="0" desc="spotmap73_tooltip" descType="tooltip" groupName="" isScene="true" planar="false" scene="pano47" jsClick="spotmap73ActionSpotFloorPlan">
+											<icon url="spots/pin_curved_2d_shadowed_user_defaultmap1.png" iconWidth="32" iconHeight="32" iconAnchor="center" />
+										</spot>
+										<spot name="spotmap74" posX="0.279141009" posY="0.478704989" heading="0" desc="spotmap74_tooltip" descType="tooltip" groupName="" isScene="true" planar="false" scene="pano45" jsClick="spotmap74ActionSpotFloorPlan">
+											<icon url="spots/pin_curved_2d_shadowed_user_defaultmap1.png" iconWidth="32" iconHeight="32" iconAnchor="center" />
+										</spot>
+										<spot name="spotmap75" posX="0.377301008" posY="0.475297987" heading="0" desc="spotmap75_tooltip" descType="tooltip" groupName="" isScene="true" planar="false" scene="pano46" jsClick="spotmap75ActionSpotFloorPlan">
+											<icon url="spots/pin_curved_2d_shadowed_user_defaultmap1.png" iconWidth="32" iconHeight="32" iconAnchor="center" />
+										</spot>
+										<spot name="spotmap76" posX="0.177913994" posY="0.371380001" heading="0" desc="spotmap76_tooltip" descType="tooltip" groupName="" isScene="true" planar="false" scene="pano42" jsClick="spotmap76ActionSpotFloorPlan">
+											<icon url="spots/pin_curved_2d_shadowed_user_defaultmap1.png" iconWidth="32" iconHeight="32" iconAnchor="center" />
+										</spot>
+										<spot name="spotmap77" posX="0.187116995" posY="0.568994999" heading="0" desc="spotmap77_tooltip" descType="tooltip" groupName="" isScene="true" planar="false" scene="pano43" jsClick="spotmap77ActionSpotFloorPlan">
+											<icon url="spots/pin_curved_2d_shadowed_user_defaultmap1.png" iconWidth="32" iconHeight="32" iconAnchor="center" />
+										</spot>
+										<spot name="spotmap78" posX="0.245398998" posY="0.655876994" heading="0" desc="spotmap78_tooltip" descType="tooltip" groupName="" isScene="true" planar="false" scene="pano44" jsClick="spotmap78ActionSpotFloorPlan">
+											<icon url="spots/pin_curved_2d_shadowed_user_defaultmap1.png" iconWidth="32" iconHeight="32" iconAnchor="center" />
+										</spot>
+										<spot name="spotmap79" posX="0.214724004" posY="0.775128007" heading="0" desc="spotmap79_tooltip" descType="tooltip" groupName="" isScene="true" planar="false" scene="pano40" jsClick="spotmap79ActionSpotFloorPlan">
+											<icon url="spots/pin_curved_2d_shadowed_user_defaultmap1.png" iconWidth="32" iconHeight="32" iconAnchor="center" />
+										</spot>
+										<spot name="spotmap80" posX="0.211656004" posY="0.284496993" heading="0" desc="spotmap80_tooltip" descType="tooltip" groupName="" isScene="true" planar="false" scene="pano37" jsClick="spotmap80ActionSpotFloorPlan">
+											<icon url="spots/pin_curved_2d_shadowed_user_defaultmap1.png" iconWidth="32" iconHeight="32" iconAnchor="center" />
+										</spot>
+										<spot name="spotmap81" posX="0.230060995" posY="0.195911005" heading="0" desc="spotmap81_tooltip" descType="tooltip" groupName="" isScene="true" planar="false" scene="pano38" jsClick="spotmap81ActionSpotFloorPlan">
+											<icon url="spots/pin_curved_2d_shadowed_user_defaultmap1.png" iconWidth="32" iconHeight="32" iconAnchor="center" />
+										</spot>
+										<spot name="spotmap82" posX="0.174847007" posY="0.114139996" heading="0" desc="spotmap82_tooltip" descType="tooltip" groupName="" isScene="true" planar="false" scene="pano39" jsClick="spotmap82ActionSpotFloorPlan">
+											<icon url="spots/pin_curved_2d_shadowed_user_defaultmap1.png" iconWidth="32" iconHeight="32" iconAnchor="center" />
+										</spot>
+							</floorplanItem>
+		</floorplanItems>
+	</ptplugin>
+	
+	<action name="kolorFloorplanJsReady_floorPlan">
+		set(ptplugin[floorPlan].jsready, true);
+		
+		ifnot(ptplugin[floorPlan].floorplanItems.selectedSpot == "",
+			set(ptplugin[floorPlan].floorplanItems.selectedSpotFov, get(view.hfov));
+			js(invokePluginFunction(floorPlan, setKolorFloorPlanSelectedSpotOptions, get(xml.scene), get(view.hlookat), get(view.hfov)));
+		);
+	</action>
+	
+	
+	
+					<!-- floorplan panogroup48 spots counter : 11 -->
+						<action name="spotmap72ActionSpotFloorPlan">
+          mainloadscene(pano41);lookat(get(panoview.h), get(panoview.v), get(panoview.fov));
+
+</action>
+						<action name="spotmap73ActionSpotFloorPlan">
+          mainloadscene(pano47);lookat(get(panoview.h), get(panoview.v), get(panoview.fov));
+
+</action>
+						<action name="spotmap74ActionSpotFloorPlan">
+          mainloadscene(pano45);lookat(get(panoview.h), get(panoview.v), get(panoview.fov));
+
+</action>
+						<action name="spotmap75ActionSpotFloorPlan">
+          mainloadscene(pano46);lookat(get(panoview.h), get(panoview.v), get(panoview.fov));
+
+</action>
+						<action name="spotmap76ActionSpotFloorPlan">
+          mainloadscene(pano42);lookat(get(panoview.h), get(panoview.v), get(panoview.fov));
+
+</action>
+						<action name="spotmap77ActionSpotFloorPlan">
+          mainloadscene(pano43);lookat(get(panoview.h), get(panoview.v), get(panoview.fov));
+
+</action>
+						<action name="spotmap78ActionSpotFloorPlan">
+          mainloadscene(pano44);lookat(get(panoview.h), get(panoview.v), get(panoview.fov));
+
+</action>
+						<action name="spotmap79ActionSpotFloorPlan">
+          mainloadscene(pano40);lookat(get(panoview.h), get(panoview.v), get(panoview.fov));
+
+</action>
+						<action name="spotmap80ActionSpotFloorPlan">
+          mainloadscene(pano37);lookat(get(panoview.h), get(panoview.v), get(panoview.fov));
+
+</action>
+						<action name="spotmap81ActionSpotFloorPlan">
+          mainloadscene(pano38);lookat(get(panoview.h), get(panoview.v), get(panoview.fov));
+
+</action>
+						<action name="spotmap82ActionSpotFloorPlan">
+          mainloadscene(pano39);lookat(get(panoview.h), get(panoview.v), get(panoview.fov));
+
+</action>
+	
+	
+	<events name="floorPlanEvents" 
+	onxmlcomplete="ifnot(floorPlanFloorPlanLoaded,set(tour_displayfloorplan,true););floorPlanActivateDefaultSpot();" 
+	onviewchanged="floorPlanOnViewChange();" 
+	onhidetourfloorplan="floorPlanCloseTourFloorPlan();" 
+	onshowtourfloorplan="if(tour_displayfloorplan,floorPlanOpenTourFloorPlan(););" 
+	onTourStart="floorPlanOpenTourFloorPlan();"
+	changetourlanguage="floorPlanChangeLanguage();"
+	keep="true" />
+	
+	<action name="floorPlanChangeLanguage">
+		if(ptplugin[floorPlan].jsready,
+			stopdelayedcall(delay_floorPlan);
+			js(invokePluginFunction(floorPlanArea, changeLanguage, false));
+			js(invokePluginFunction(floorPlan, changeLanguage));
+		,
+			delayedcall(delay_floorPlan, 0.1, floorPlanChangeLanguage(););
+		);
+	</action>
+	
+	
+	<krpano floorPlanFloorPlanLoaded="false" />
+	
+	<action name="floorPlanHideTourFloorPlan">
+		hideKolorArea_floorPlanArea(false);
+	</action>
+	
+	<action name="floorPlanCloseTourFloorPlan">
+		closeKolorArea_floorPlanArea();
+	</action>
+	
+	<action name="floorPlanShowTourFloorPlan">
+		if(ptplugin[floorPlanArea].isOpen === null,
+			openKolorArea_floorPlanArea();
+		,
+			showKolorArea_floorPlanArea(false);
+		);
+	</action>
+	
+	<action name="floorPlanOpenTourFloorPlan">
+		openKolorArea_floorPlanArea();
+	</action>
+	
+	<action name="floorPlanOnViewChange">
+		if (floorPlanFloorPlanLoaded == true,
+			ifnot(ptplugin[floorPlan].floorplanItems.selectedSpot == "",
+				ifnot(scene[get(xml.scene)].planar,
+					js(invokePluginFunction(floorPlan, changeDirection, get(xml.scene), get(view.hlookat), get(view.hfov)));
+				);
+			);
+		);
+	</action>
+	
+	<action name="floorPlanActivateSpot">
+		
+		set(ptplugin[floorPlan].floorplanItems.selectedSpot, %1);
+		set(ptplugin[floorPlan].floorplanItems.selectedItem, %2);
+		
+		if(%1 !== "",
+			set(ptplugin[floorPlan].floorplanItems.selectedSpotScene, get(xml.scene));
+			set(ptplugin[floorPlan].floorplanItems.selectedSpotHeading, get(view.hlookat));
+			set(ptplugin[floorPlan].floorplanItems.selectedSpotFov, get(view.hfov));
+		);
+		
+		
+		if(ptplugin[floorPlanArea].isOpen,
+			floorPlanSelectActivatedSpot(%1, %2, %3);
+		);
+	</action>
+	
+	<action name="floorPlanSelectActivatedSpot">
+		js(invokePluginFunction(floorPlan, selectSpot, %1, %2, %3));
+
+		if(%1 !== "",
+			if(scene[get(xml.scene)].planar,
+				js(invokePluginFunction(floorPlan, hideRadar));
+			,
+				js(invokePluginFunction(floorPlan, changeDirection, get(xml.scene), get(view.hlookat), get(view.hfov)));
+			);
+		);
+	</action>
+	
+	<action name="floorPlanDeactivateSpot">
+		set(ptplugin[floorPlan].floorplanItems.selectedSpot, "");
+		
+		js(invokePluginFunction(floorPlan, unselectSpot));
+	</action>
+	
+	<action name="floorPlanActivateDefaultSpot">
+		set(floorPlanFloorPlanLoaded, true);
+		
+		set(floorPlanSpotFound, "");
+		set(floorPlanSpotScene, "");
+		set(floorPlanItemFound, "");
+		set(floorPlanItemSearch, true);
+		set(floorPlanSpotSearchActivated, true);
+		set(floorPlanSpotSearchContinue, true);
+		
+		
+		for(set(defaultfloorplaniteminc,0), defaultfloorplaniteminc LT ptplugin[floorPlan].floorplanItems.floorplanItem.count , inc(defaultfloorplaniteminc),
+                        if(floorPlanSpotSearchActivated == true,
+				
+				if(ptplugin[floorPlan].floorplanItems.floorplanItem[get(defaultfloorplaniteminc)].groupName == scene[get(xml.scene)].group,
+					set(floorPlanItemFound, get(ptplugin[floorPlan].floorplanItems.floorplanItem[get(defaultfloorplaniteminc)].name));
+					set(ptplugin[floorPlan].floorplanItems.selectedItem, get(ptplugin[floorPlan].floorplanItems.floorplanItem[get(defaultfloorplaniteminc)].name));
+					set(floorPlanItemSearch, false);
+				,
+					
+					if(floorPlanItemFound == "",
+						set(floorPlanItemFound, get(ptplugin[floorPlan].floorplanItems.floorplanItem[get(defaultfloorplaniteminc)].name));
+					);
+				);
+			);
+			if(floorPlanSpotSearchActivated == true,
+                                for(set(defaultspotinc,0), defaultspotinc LT ptplugin[floorPlan].floorplanItems.floorplanItem[get(defaultfloorplaniteminc)].spot.count , inc(defaultspotinc),
+                                        if(ptplugin[floorPlan].floorplanItems.floorplanItem[get(defaultfloorplaniteminc)].spot[get(defaultspotinc)].isScene == true,
+					
+						if(floorPlanSpotSearchContinue == true,
+							if(ptplugin[floorPlan].floorplanItems.floorplanItem[get(defaultfloorplaniteminc)].spot[get(defaultspotinc)].scene == xml.scene,
+								set(floorPlanSpotFound, get(ptplugin[floorPlan].floorplanItems.floorplanItem[get(defaultfloorplaniteminc)].spot[get(defaultspotinc)].name));
+								set(floorPlanSpotScene, get(ptplugin[floorPlan].floorplanItems.floorplanItem[get(defaultfloorplaniteminc)].spot[get(defaultspotinc)].scene));
+								set(ptplugin[floorPlan].floorplanItems.selectedItem, get(ptplugin[floorPlan].floorplanItems.floorplanItem[get(defaultfloorplaniteminc)].name));
+								if(floorPlanItemSearch == false,
+									set(floorPlanSpotSearchContinue, false);
+									set(floorPlanSpotSearchActivated, false);
+								);
+							);
+						);
+					);
+					
+				);
+			);
+		);
+		
+		if(floorPlanSpotFound == "",
+			
+			
+			floorPlanDeactivateSpot();
+			
+			
+			set(ptplugin[floorPlan].floorplanItems.selectedItem, get(floorPlanItemFound));
+			
+			
+			ifnot(ptplugin[floorPlan].floorplanItems.selectedItem == "",
+				floorPlanActivateSpot("", get(ptplugin[floorPlan].floorplanItems.selectedItem), "");
+			);
+		,
+			
+			floorPlanActivateSpot(get(floorPlanSpotFound), get(ptplugin[floorPlan].floorplanItems.selectedItem), get(floorPlanSpotScene));
+		);
+	</action>
+	
+	<action name="floorPlanChangeTitle">
+		js(invokePluginFunction(floorPlan, changeTitle, %1));
+	</action>
+	
+	<ptplugin name="floorPlanArea" engine="kolorArea">
+	<settings>
+		<option name="position" value="topright" type="string" />
+		<option name="start_position" value="left" type="string" />
+		<option name="margin_x" value="0" type="int" />
+		<option name="margin_y" value="0" type="int" />
+		<option name="display_title" value="false" type="bool" />
+		<option name="title_font" value="Verdana" type="string" />
+		<option name="title_size" value="14" type="int" />
+		<option name="title_weight" value="normal" type="string" />
+		<option name="title_decoration" value="normal" type="string" />
+		<option name="title_color" value="000000" type="string" />
+		<option name="close_displayed" value="false" type="bool" />
+		<option name="close_text" value="floorPlandisplay_close_text" type="string" />
+
+		<option name="background_color" value="f2f2f2" type="string" />
+		<option name="background_alpha" value="1" type="float" />
+		<option name="overlay_displayed" value="false" type="bool" />
+		<option name="overlay_color" value="000000" type="string" />
+		<option name="overlay_alpha" value="0.50000762951094835" type="float" />
+
+		<option name="padding" value="15" type="int" />
+		<option name="topleft_radius" value="0" type="int" />
+		<option name="topright_radius" value="0" type="int" />
+		<option name="bottomleft_radius" value="0" type="int" />
+		<option name="bottomright_radius" value="0" type="int" />
+		<option name="area_border_width" value="0" type="int" />
+		<option name="area_border_color" value="f2f2f2" type="string" />
+		<option name="area_border_alpha" value="1" type="float" />
+		<option name="area_width" value="20" type="int" />
+		<option name="area_height" value="100" type="int" />
+		<option name="area_width_unit" value="percent" type="string" />
+		<option name="area_height_unit" value="percent" type="string" />
+		<option name="animation" value="false" type="bool" />
+		<option name="animation_duration" value="500" type="int" />
+		<option name="close_on_click" value="false" type="bool" />
+		<option name="refresh_content" value="false" type="bool" />
+		<option name="open_callback" value="addKolorFloorPlan('floorPlan', 'floorPlanArea_floorplanDIV');" type="string" />
+		<option name="close_callback" value="invokeKrFunction('closeKolorAreaCallback_floorPlanArea')" type="string" />
+		<option name="zorder" value="5" type="int" />
+		<option name="use_i18n" value="true" type="bool" />
+	</settings>
+	</ptplugin>
+	
+	<action name="kolorAreaJsReady_floorPlanArea">
+		set(ptplugin[floorPlanArea].jsready, true);
+
+		inc(tour_autorotation_openatstartplugin);
+		set(ptplugin[floorPlanArea].autorotateBlocked, true);
+
+	</action>
+	
+	<action name="openKolorArea_floorPlanArea">
+		ifnot(ptplugin[floorPlanArea].isOpen,
+			set(ptplugin[floorPlanArea].isOpen, true);
+			pauseautorotation(forceplugin);
+
+			js(showKolorArea(floorPlanArea, &lt;div id="floorPlanArea_floorplanDIV"&gt;&lt;/div&gt;));
+			
+			if(ptplugin[floorPlan].floorplanItems.selectedSpot != "",
+				floorPlanSelectActivatedSpot(get(ptplugin[floorPlan].floorplanItems.selectedSpot), get(ptplugin[floorPlan].floorplanItems.selectedItem), get(ptplugin[floorPlan].floorplanItems.selectedSpotScene));
+			);
+			events.dispatch(onremovedisplayedobject);
+		);
+	</action>
+	
+	<action name="closeKolorArea_floorPlanArea">
+		if(ptplugin[floorPlanArea].isOpen,
+			js(invokePluginFunction(floorPlanArea, closeKolorArea));
+		);
+	</action>
+	
+	<action name="toggleKolorArea_floorPlanArea">
+		if(ptplugin[floorPlanArea].isOpen,
+			closeKolorArea_floorPlanArea();
+		,
+			openKolorArea_floorPlanArea();
+		);
+	</action>
+	
+	<action name="closeKolorAreaCallback_floorPlanArea">
+		if(ptplugin[floorPlanArea].isOpen,resumeautorotation(forceplugin);
+
+			if(ptplugin[floorPlanArea].autorotateBlocked,if(tour_autorotation_openatstartplugin GT 0,dec(tour_autorotation_openatstartplugin);set(ptplugin[floorPlanArea].autorotateBlocked,false);););
+		);
+		set(ptplugin[floorPlanArea].isOpen, false);hideFloorplan();
+
+	</action>
+	
+	<action name="changeTitleKolorArea_floorPlanArea">
+		js(invokePluginFunction(floorPlanArea, changeTitle, %1));
+	</action>
+	
+	<action name="showKolorArea_floorPlanArea">
+		set(ptplugin[floorPlanArea].isOpen, true);
+		pauseautorotation(forceplugin);
+
+		js(invokePluginFunction(floorPlanArea, showKolorArea, %1));
+		events.dispatch(onremovedisplayedobject);
+	</action>
+		
+	<action name="hideKolorArea_floorPlanArea">
+		resumeautorotation(forceplugin);
+
+		if(ptplugin[floorPlanArea].autorotateBlocked,if(tour_autorotation_openatstartplugin GT 0,dec(tour_autorotation_openatstartplugin);set(ptplugin[floorPlanArea].autorotateBlocked,false);););
+		set(ptplugin[floorPlanArea].isOpen, false);
+		js(invokePluginFunction(floorPlanArea, hideKolorArea, %1));
+	</action>
+	
+	<events name="kolorAreaEvents_floorPlanArea" 
+		keep="true"
+	/>
+	
+
+  <!-- FLOORPLAN -->
+  <action name="hideFloorplan">set(tour_displayfloorplan, false);events.dispatch(onhidetourfloorplan);</action>
+  <action name="showFloorplan">set(tour_displayfloorplan, true); events.dispatch(onshowtourfloorplan);</action>
+
+
+<action name="setViewNormal">
+	stopSetViewTweens();
+	if(current_view_isflat === true,
+		setViewNonFlat(VFOV);
+	);
+	setViewNormalComplete();
+</action>
+
+<action name="setViewNormalComplete">
+	set(view.fisheyefovlink, 0.5);
+	set(view.fovmax, get(panoview.fovmax));
+	tween(view.architectural, 0.0, distance(1.0, 0.45));
+	tween(view.pannini, 0.0, distance(1.0, 0.45), easeOutQuad, if(panniniViewActivated,restoreViewFromPannini();););
+	tween(view.vlookat, get(panoview.v), distance(90, 0.45));
+	tween(view.fov, get(panoview.fov), distance(50, 0.45));
+	tween(view.fisheye, 0.0, distance(1.0, 0.45),
+		set(view.stereographic,false);
+	);
+</action>
+
+<krpano normalViewActivated="true" />
+<action name="stopSetViewTweens">
+	stoptween(view.fov);
+	stoptween(view.vlookat);
+	stoptween(view.fisheye);
+	stoptween(view.architectural);
+	stoptween(view.pannini);
+</action>
+
+<action name="setViewArchitectural">
+	if(normalViewActivated,stopSetViewTweens(););
+	if(current_view_isflat === true,
+		setViewNonFlat(VFOV);
+	);
+	setViewArchitecturalComplete();
+</action>
+
+<action name="setViewArchitecturalComplete">
+	set(view.fovmax, get(panoview.fovmax));
+	set(view.fisheyefovlink, 0.5);
+	tween(view.architectural, 1.0, distance(1.0, 0.45));
+	tween(view.pannini, 0.0, distance(1.0, 0.45), easeOutQuad, if(panniniViewActivated,restoreViewFromPannini();););
+	tween(view.fisheye, 0.0, distance(1.0, 0.45), easeOutQuad, 
+		set(view.stereographic,false);
+		tween(view.vlookat, get(panoview.v), distance(90, 0.45));
+	);
+	tween(view.fov, get(panoview.fov), distance(50, 0.45));
+</action>
+
+<action name="setViewLittlePlanet">
+	set(sceneisfull360, false);
+	if(scene[get(xml.scene)].full360,
+		sub(viewhfov, panoview.hmax, panoview.hmin);
+		if (viewhfov == 360,
+			sub(viewvfov, panoview.vmax, panoview.vmin);
+			if (viewvfov == 180,
+				set(sceneisfull360, true);
+			);
+		);
+	);
+	if (sceneisfull360 AND (device.webgl OR device.flash),
+		if(normalViewActivated,stopSetViewTweens(););
+		if(current_view_isflat === true,
+			setViewNonFlat(VFOV);
+		);
+		setViewLittlePlanetComplete();
+	);
+</action>
+
+<action name="setViewLittlePlanetComplete">
+	set(backtonormalfirst,false);
+	if(view.pannini GE 1.0, set(backtonormalfirst,true));
+	if(view.stereographic == false, set(backtonormalfirst,true));
+	if(backtonormalfirst, hideTooltip();tween(view.fisheye, 0.0 ,distance(1.0, 0.25), easeOutQuad, WAIT); );
+	set(view.stereographic, true);
+	set(view.fisheyefovlink, 1.5);
+	tween(view.architectural, 0.0, 0.25);
+	tween(view.vlookat, 90, distance(179, 1.50));
+	tween(view.pannini, 0.0, distance(1.0, 0.75), easeOutQuad, if(panniniViewActivated,restoreViewFromPannini();););
+	if(panoview.fovmax LE 150, set(view.fovmax, 150); , set(view.fovmax, get(panoview.fovmax)); );
+	tween(view.fisheye, 1.0, distance(1.0, 0.75));
+	tween(view.fov, 150, distance(179, 0.75));
+</action>
+
+  <!-- Fullscreen Management -->
+  <action name="exitFullScreen" devices="fullscreensupport">set(tour_fullscreen,false);js(setFullscreen(false));</action>
+  <action name="enterFullScreen" devices="fullscreensupport">set(tour_fullscreen,true);js(setFullscreen(true));</action>
+  <action name="switchFullScreen">if(tour_fullscreen,exitFullScreen();,enterFullScreen(););</action>
+
+  
+  <events name="krpanoExitFullscreenEvent"
+    onexitfullscreen="if(tour_fullscreen,exitFullScreenChangeEvent(););"
+    keep="true" />
+
+  <action name="exitFullScreenChangeEvent" devices="fullscreensupport">set(tour_fullscreen,false);events.dispatch(onexitfullscreen);</action>
+  <action name="enterFullScreenChangeEvent" devices="fullscreensupport">set(tour_fullscreen,true);events.dispatch(onenterfullscreen);</action>
+  <action name="exitFullScreenFallback">set(fullscreen,false);</action>
+  <action name="enterFullScreenFallback">set(fullscreen,true);</action>
+  
+  <action name="resizeFullScreenEvent">delayedcall(0,updatescreen(););</action>
+
+</krpano>
